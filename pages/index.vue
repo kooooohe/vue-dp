@@ -33,8 +33,8 @@
               </tr>
             </thead>
             <tbody>
-              <tr v-for="items in dp" :key="items.index">
-                <td v-for="item in items" :key="item">{{ item }}</td>
+              <tr v-for="m of M + 1" :key="m">
+                <td v-for="(item,index) in dp[m-1]" :key="item.keys[index]">{{ item[index] }}</td>
               </tr>
             </tbody>
           </template>
@@ -62,7 +62,27 @@ export default Vue.extend({
       numbers: [9, 1, 2, 3, 9] as number[],
       text: "" as string,
       cTable: [[]] as number[][],
-      dp: [[]] as number[][],
+      // dp: [[{val:0,key:""}]] as any,
+      dp:   [    {
+          0: 0,
+          1: 0,
+          2: 0,
+          3: 0,
+          colors: {
+            0: '',
+            1: '',
+            2: '',
+            3: '',
+          },
+          keys: {
+            0: '1',
+            1: '2',
+            2: '3',
+            3: '4',
+          },
+          
+          
+          }] as any,
     };
   },
   methods: {
@@ -81,10 +101,34 @@ export default Vue.extend({
         }
       }
     },
-    culc() {
-      this.dp = new Array(this.N + 1);
+    async culc() {
+      this.dp.shift()
+      // this.dp = new Array(this.N + 1);
       for (let i = 0; i < this.N + 1; ++i) {
-        this.dp[i] = new Array(this.M + 1).fill(-Number.MAX_VALUE);
+        // this.dp[i] = new Array(this.M + 1).fill(-Number.MAX_VALUE);
+         this.dp.push({
+          0: -Number.MAX_VALUE,
+          1: -Number.MAX_VALUE,
+          2: -Number.MAX_VALUE,
+          3: -Number.MAX_VALUE,
+          colors: {
+            0: false,
+            1: false,
+            2: false,
+            3: false,
+          },
+          keys: {
+            0: this.uuid(),
+            1: this.uuid(),
+            2: this.uuid(),
+            3: this.uuid(),
+          },
+          
+          
+          })
+        // for (let m = 0; m < this.M + 1; ++m) {
+        //   this.dp[i][m] = {val: -Number.MAX_VALUE, key: uuid.v4()}
+        // }
       }
       this.dp[0][0] = 0;
       for (let i = 0; i <= this.N; ++i) {
@@ -92,13 +136,19 @@ export default Vue.extend({
           if (k > i) {
             break;
           }
+                      await new Promise((resolve) => setTimeout(resolve, 1000));
+
           for (let j = 0; j < i; ++j) {
              if (this.dp[i][k] < this.dp[j][k-1] + this.cTable[j][i]) {
-               this.dp[i][k] = this.dp[j][k-1] + this.cTable[j][i]
+               this.dp[i][k] = this.dp[j][k-1]+ this.cTable[j][i]
+                     // this.$set(this.dp[0], 0, {val:9, key:"aa"});
+                     // this.dp[0][0] =  Object.assign({}, this.dp[0], { val: 1, key: 1111 })
+
              }
           }
         }
       }
+
       // todo check all last array values
       console.log(this.dp[this.N][this.M])
     },
